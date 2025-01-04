@@ -114,6 +114,31 @@ tokenizer_manager: TokenizerManager = None
 scheduler_info: Dict = None
 
 
+@app.middleware("http")
+async def log_request_middleware(request: Request, call_next):
+    if tokenizer_manager.server_args.log_requests and request.method == "POST":
+        try:
+            if tokenizer_manager.server_args.log_requests:
+                # Log request headers and query parameters
+                logger.info(f"Request headers: {request.headers}")
+                logger.info(f"Request query params: {request.query_params}")
+                
+                # Log request body (if applicable)
+                body = await request.body()
+                if body:
+                    logger.info(f"Request body: {body.decode('utf-8')}")
+                else:
+                    logger.info("Request body: (empty)")
+        
+        except Exception as e:
+            # Log the error but do not raise an exception
+            logger.error(f"Error logging request: {e}")
+            # Continue processing the request
+
+    # Call the next middleware or route handler
+    response = await call_next(request)
+    return response
+
 ##### Native API endpoints #####
 
 
