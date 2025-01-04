@@ -119,9 +119,8 @@ async def log_request_middleware(request: Request, call_next):
     if tokenizer_manager.server_args.log_requests and request.method == "POST":
         try:
             if tokenizer_manager.server_args.log_requests:
-                # Log request headers and query parameters
+                # Log request headers
                 logger.info(f"Request headers: {request.headers}")
-                logger.info(f"Request query params: {request.query_params}")
                 
                 # Log request body (if applicable)
                 body = await request.body()
